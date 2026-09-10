@@ -1,0 +1,265 @@
+html_content = """<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘 먹을 저녁 메뉴 추천 🍽️</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #FFF6E9 0%, #FFEFD5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #2D3436;
+        }
+
+        .container {
+            background: #FFFFFF;
+            max-width: 480px;
+            width: 100%;
+            padding: 40px 30px;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(255, 126, 95, 0.12), 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #FF7E5F, #FEB47B, #FF6B6B);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #FFF0ED;
+            color: #FF5733;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #2D3436;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #636E72;
+            margin-bottom: 36px;
+        }
+
+        .display-card {
+            background: #FAFAFA;
+            border: 2px dashed #E0E0E0;
+            border-radius: 20px;
+            padding: 36px 20px;
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .display-card.active {
+            border-style: solid;
+            border-color: #FF7E5F;
+            background: #FFF9F6;
+            box-shadow: 0 10px 25px rgba(255, 126, 95, 0.15);
+        }
+
+        .emoji-box {
+            font-size: 80px;
+            line-height: 1;
+            margin-bottom: 16px;
+            transition: transform 0.2s ease;
+            user-select: none;
+        }
+
+        .menu-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2D3436;
+            min-height: 32px;
+        }
+
+        .menu-category {
+            font-size: 13px;
+            color: #FF5733;
+            font-weight: 600;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-recommend {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #FF7E5F 0%, #FF5733 100%);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 87, 51, 0.3);
+            transition: all 0.2s ease;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-recommend:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(255, 87, 51, 0.4);
+        }
+
+        .btn-recommend:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 12px rgba(255, 87, 51, 0.2);
+        }
+
+        .footer-note {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #B2BEC3;
+        }
+
+        /* 애니메이션 효과 */
+        @keyframes pop {
+            0% { transform: scale(0.6); opacity: 0; }
+            70% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .pop-animation {
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <span class="badge">TODAY'S DINNER</span>
+        <h1>오늘 뭐 먹지?</h1>
+        <p class="subtitle">결정 장애가 온 당신을 위한 무작위 저녁 추천!</p>
+
+        <div class="display-card" id="card">
+            <div class="emoji-box" id="emoji">🤔</div>
+            <div class="menu-name" id="menuName">버튼을 눌러보세요!</div>
+            <div class="menu-category" id="category">DINNER RECOMMENDER</div>
+        </div>
+
+        <button class="btn-recommend" id="recommendBtn" onclick="getRecommendation()">
+            🎲 저녁 메뉴 추천 받기
+        </button>
+
+        <p class="footer-note">마음에 들지 않으면 한 번 더 눌러보세요!</p>
+    </div>
+
+    <script>
+        // 메뉴 데이터 베이스 (이모지, 메뉴명, 카테고리)
+        const menuList = [
+            { emoji: '🍕', name: '피자', category: '양식' },
+            { emoji: '🍔', name: '수제버거', category: '패스트푸드' },
+            { emoji: '🍗', name: '치킨', category: '야식 / 한식' },
+            { emoji: '🍜', name: '라멘', category: '일식' },
+            { emoji: '🍣', name: '초밥', category: '일식' },
+            { emoji: '🥩', name: '삼겹살 구이', category: '한식' },
+            { emoji: '🥘', name: '부대찌개', category: '한식' },
+            { emoji: '🍲', name: '김치찌개 / 된장찌개', category: '한식' },
+            { emoji: '🍛', name: '카레라이스', category: '일식 / 아시안' },
+            { emoji: '🍝', name: '토마토 / 크림 파스타', category: '양식' },
+            { emoji: '🌮', name: '타코 / 퀘사디아', category: '멕시칸' },
+            { emoji: '🍲', name: '마라탕 / 마라샹궈', category: '중식' },
+            { emoji: '🥢', name: '짜장면 & 탕수육', category: '중식' },
+            { emoji: '🥗', name: '샐러드 포케', category: '건강식' },
+            { emoji: '🍱', name: '돈가스 정식', category: '일식' },
+            { emoji: '🍲', name: '샤브샤브', category: '한식 / 일식' },
+            { emoji: '🥙', name: '족발 & 보쌈', category: '한식' },
+            { emoji: '🍢', name: '떡볶이 & 튀김', category: '분식' },
+            { emoji: '🍚', name: '제육볶음 정식', category: '한식' },
+            { emoji: '🍲', name: '곱창전골', category: '한식' }
+        ];
+
+        let isAnimating = false;
+
+        function getRecommendation() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const emojiEl = document.getElementById('emoji');
+            const menuNameEl = document.getElementById('menuName');
+            const categoryEl = document.getElementById('category');
+            const cardEl = document.getElementById('card');
+            const btnEl = document.getElementById('recommendBtn');
+
+            btnEl.disabled = true;
+            cardEl.classList.add('active');
+
+            // 룰렛 효과 (빠르게 이모지 바꾸기)
+            let counter = 0;
+            const interval = setInterval(() => {
+                const randomTemp = menuList[Math.floor(Math.random() * menuList.length)];
+                emojiEl.textContent = randomTemp.emoji;
+                menuNameEl.textContent = '추천 중...';
+                categoryEl.textContent = 'CHOOSING...';
+                counter++;
+
+                if (counter > 12) {
+                    clearInterval(interval);
+                    
+                    // 최종 선택
+                    const finalSelection = menuList[Math.floor(Math.random() * menuList.length)];
+                    
+                    // 애니메이션 적용
+                    emojiEl.classList.remove('pop-animation');
+                    void emojiEl.offsetWidth; // reflow 실행하여 애니메이션 리셋
+                    emojiEl.classList.add('pop-animation');
+
+                    emojiEl.textContent = finalSelection.emoji;
+                    menuNameEl.textContent = finalSelection.name;
+                    categoryEl.textContent = finalSelection.category;
+
+                    btnEl.disabled = false;
+                    isAnimating = false;
+                }
+            }, 80);
+        }
+    </script>
+</body>
+</html>
+"""
+
+with open("dinner_recommendation.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("[file-tag: dinner_recommendation.html]")
